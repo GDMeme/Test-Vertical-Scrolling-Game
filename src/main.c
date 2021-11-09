@@ -9,7 +9,7 @@
 // front of exactly ONE of the following lines:
 
 #define BUTTON_BLINK
-// #define LIGHT_SCHEDULER
+//#define LIGHT_SCHEDULER
 // #define TIME_RAND
 // #define KEYPAD
 // #define KEYPAD_CONTROL
@@ -53,18 +53,150 @@ int main(void)
     // (depending on which of the #define statements at the top of this file has been uncommented)
 
 #ifdef BUTTON_BLINK
+    
     // Wait for the user to push the blue button, then blink the LED.
+    InitializePin(GPIOA, GPIO_PIN_3, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_2, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_10, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_3, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_5, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_4, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_10, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_8, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_9, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOC, GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_6, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_6, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOA, GPIO_PIN_5, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_9, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOB, GPIO_PIN_8, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
 
+
+    int abc = 0;
+
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, false);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, false);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, false);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, false);
+
+    void a() {
+        switch (abc) {
+            case 1:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, true);
+                break;
+            case 2:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, true);
+                break;
+            case 3:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, true);
+                break;
+            case 4:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, true);
+                break;
+            case 5:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, true);
+                break;
+            case 6:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, true);
+                break;
+            case 7:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, true);
+                break;
+            case 8:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, true);
+                break;
+            case 9:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, true);
+                break;
+            case 10:
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, true);
+                break;
+            case 11:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, true);
+                break;
+            case 12:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, true);
+                break;
+            case 13:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, true);
+                break;
+            case 14:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, true);
+                break;
+            case 15:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, true);
+                break;
+            case 16:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, true);
+                break;
+            default:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, false);
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, false);
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, false);
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, false);
+        }
+    }
+    
+
+    
+
+
+    
     // wait for button press (active low)
-    while (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
+    //while (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
+    while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5))
     {
     }
-
+    
     while (1) // loop forever, blinking the LED
     {
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-        HAL_Delay(250);  // 250 milliseconds == 1/4 second
+        //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
+        //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, true);
+        //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, true);
+
+        //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, false);
+        
+        //HAL_Delay(10);  // 250 milliseconds == 1/4 second
+        //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+        //HAL_Delay(10);
+        //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
+        /* for (int i = 0; i < 10; ++i) {
+            abc++;
+            a();
+            HAL_Delay(400);
+        }
+        HAL_Delay(400);
+        abc = 0;
+        a();
+        HAL_Delay(400) */;
     }
+                    
+    
 #endif
 
 #ifdef LIGHT_SCHEDULER
