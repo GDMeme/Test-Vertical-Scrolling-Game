@@ -26,6 +26,8 @@
 
 #include "ece198.h"
 
+#include <math.h>
+
 int main(void)
 {
     HAL_Init(); // initialize the Hardware Abstraction Layer
@@ -73,8 +75,6 @@ int main(void)
     InitializePin(GPIOB, GPIO_PIN_8, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
 
 
-    int abc = 0;
-
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, false);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, false);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, false);
@@ -92,7 +92,7 @@ int main(void)
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, false);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, false);
 
-    void a() {
+    void a(int abc) {
         switch (abc) {
             case 1:
                 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, true);
@@ -142,6 +142,54 @@ int main(void)
             case 16:
                 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, true);
                 break;
+            case 17:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, false);
+                break;
+            case 18:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, false);
+                break;
+            case 19:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, false);
+                break;
+            case 20:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, false);
+                break;
+            case 21:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, false);
+                break;
+            case 22:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, false);
+                break;
+            case 23:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, false);
+                break;
+            case 24:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, false);
+                break;
+            case 25:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, false);
+                break;
+            case 26:
+                HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, false);
+                break;
+            case 27:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, false);
+                break;
+            case 28:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, false);
+                break;
+            case 29:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, false);
+                break;
+            case 30:
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, false);
+                break;
+            case 31:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, false);
+                break;
+            case 32:
+                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, false);
+                break;
             default:
                 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, false);
                 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, false);
@@ -185,15 +233,23 @@ int main(void)
         //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
         //HAL_Delay(10);
         //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
-        /* for (int i = 0; i < 10; ++i) {
-            abc++;
-            a();
-            HAL_Delay(400);
-        }
+
+// column is power 4, 6, 7, 11, 12, 14
+// row is ground 16 15 10 9 8 5 3
+// broken column or row pins 13 2 1
+        a(14);
+        //a(3);
+        //a(5);
+        //a(8);
+        //a(9);
+        //a(10);
+        //a(15);
+        //a(16);
         HAL_Delay(400);
-        abc = 0;
-        a();
-        HAL_Delay(400) */;
+        HAL_Delay(400);
+        //a(1);
+        //a(2);
+        //a(13);
     }
                     
     
