@@ -27,6 +27,7 @@
 #include "ece198.h"
 
 #include <math.h>
+#include <time.h>
 
 int main(void)
 {
@@ -50,13 +51,13 @@ int main(void)
     // (anything we write to the serial port will appear in the terminal (i.e. serial monitor) in VSCode)
 
     SerialSetup(9600);
-
+    srand(time(NULL));
     // as mentioned above, only one of the following code sections will be used
     // (depending on which of the #define statements at the top of this file has been uncommented)
 
 #ifdef BUTTON_BLINK
     
-    // Wait for the user to push the blue button, then blink the LED.
+    // Wait for the user to push the blue button, then blink the LED.   
     InitializePin(GPIOA, GPIO_PIN_3, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOA, GPIO_PIN_2, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOA, GPIO_PIN_10, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
@@ -210,10 +211,33 @@ int main(void)
         }
     }
     
-
-    
-
-
+    bool useDelay = true;
+    int scrollSpeed = 100;
+    int rows[7] = {8, 3, 16, 5, 9, 15, 10};
+    int columns[6] = {4, 11, 12, 6, 14, 7};
+    void cycleLeds(int onLeds[][2], int numLeds) {
+            
+        for(int i = 0; i < numLeds; ++i) {
+            // turn on 0,0 and 0,6
+            
+            if(useDelay) {
+                for (int j=0; j < scrollSpeed; ++j) {
+                    a(columns[onLeds[i][0]]);
+                    a(rows[onLeds[i][1]]+16);
+                    HAL_Delay(1);
+                    a(columns[onLeds[i][0]]+16);
+                    a(rows[onLeds[i][1]]);
+                    HAL_Delay(1);
+                }
+            }
+            
+            a(columns[onLeds[i][0]]+16);
+            a(rows[onLeds[i][1]]);
+            /* if(useDelay) {
+                HAL_Delay(scrollSpeed);
+            } */
+        }
+    }
     
     // wait for button press (active low)
     //while (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
@@ -221,6 +245,15 @@ int main(void)
     {
     }
     
+    a(8);
+    a(3);
+    a(16);
+    a(5);
+    a(9);
+    a(15);
+    a(10);
+    a(13);
+
     while (1) // loop forever, blinking the LED
     {
         //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
@@ -234,21 +267,74 @@ int main(void)
         //HAL_Delay(10);
         //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
 
-// column is power 4, 6, 7, 11, 12, 14
-// row is ground 16 15 10 9 8 5 3
+// column is power 4 11 12 6 14 7
+// row is ground 8 3 16 5 9 15 10
 // broken column or row pins 13 2 1
-        a(14);
+        
+        /* // cycle through rows
+        for(int i = 0; i < 7; ++i) {
+            a(rows[i]+16);
+            // cycle through columns
+            for(int j = 0; j < 6; ++j) {
+                a(columns[j]);
+                if(useDelay) {
+                    HAL_Delay(scrollSpeed);
+                }
+                a(columns[j]+16);
+            }
+            a(rows[i]);
+            if(useDelay) {
+                HAL_Delay(scrollSpeed);
+            }
+        } */
+        
+        //int onLeds[][2] = {{1,0}, {1,1}, {1,2}, {1, 3}, {1,4}, {1,5}, {0,6}, {2,6}};
+        
+        
+        int arrayNum;
+        //int onLeds[7][2];
+        /* witch(arrayNum) {
+            case 0:
+                onLeds = {{1,0}, {1,1}, {1,2}, {1, 3}, {1,4}, {1,5}, {1,6}};
+                break;
+            case 1:
+                onLeds = {{0,0}, {0,1}, {0,2}, {0, 3}, {0,4}, {0,5}, {0,6}}
+                break;
+            case 2:
+                onLeds = {{3,0}, {3,1}, {3,2}, {3, 3}, {3,4}, {3,5}, {3,6}}
+                break;
+            case 3:
+                onLeds = {{2,0}, {2,1}, {2,2}, {2, 3}, {2,4}, {2,5}, {2,6}}
+                break;
+            default:
+                onLeds = {{1,0}, {1,1}, {1,2}, {1, 3}, {1,4}, {1,5}, {1,6}};
+        } */
+        int onLeds[][2] = {{arrayNum,0}, {arrayNum,1}, {arrayNum,2}, {arrayNum, 3}, {arrayNum,4}, {arrayNum,5}, {arrayNum,6}};
+        /* int onLeds2[][2] = {{0,0}, {0,1}, {0,2}, {0, 3}, {0,4}, {0,5}, {0,6}};
+        int onLeds3[][2] = {{3,0}, {3,1}, {3,2}, {3, 3}, {3,4}, {3,5}, {3,6}};
+        int onLeds4[][2] = {{2,0}, {2,1}, {2,2}, {2, 3}, {2,4}, {2,5}, {2,6}}; */
+        scrollSpeed = 20;
+        
+        arrayNum = rand()%4;
+        //cycleLeds(onLeds, 7);
+        HAL_Delay(rand()%50);
+        
+        //HAL_Delay(400);
+        //HAL_Delay(0.1);
+
+        //a(8+16);
         //a(3);
-        //a(5);
-        //a(8);
-        //a(9);
-        //a(10);
-        //a(15);
         //a(16);
-        HAL_Delay(400);
-        HAL_Delay(400);
+        //a(5);
+        //a(9);
+        //a(15);
+        //a(10);
+
+        /* BROKEN PINS */
+        //Cols 7 and 8
         //a(1);
         //a(2);
+        //Row 8
         //a(13);
     }
                     
