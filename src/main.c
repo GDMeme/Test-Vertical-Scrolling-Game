@@ -211,20 +211,65 @@ int main(void)
         }
     }
     
+
+
+
+
+
     bool useDelay = true;
     int scrollSpeed = 100;
-    int rows[7] = {8, 3, 16, 5, 9, 15, 10};
-    int columns[6] = {4, 11, 12, 6, 14, 7};
-    void cycleLeds(int onLeds[][2], int numLeds) {
+    int rows[8] = {8, 3, 16, 5, 9, 15, 10, 1};
+    int columns[8] = {4, 11, 12, 6, 14, 7, 9, 13}; 
+
+    int refreshBoard(int onLeds[8][8][1], int numRows, int numColumns){   
+        bool pressed = false;    
+        int counter = 0; 
+        for (int i = 0; i < numRows; i++){
+            for (int j = 0; j < numColumns; j++){
+                if (onLeds[i][j][0] == 1){
+                    if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))){
+                        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, true);
+                        pressed = true;
+                        HAL_Delay(0.0000000000000000000000000000000000000001);
+                        counter += 1;
+                    }
+                    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, false);
+                    a(columns[j]);
+                    a(rows[i]+16);
+                    if (false){
+                        HAL_Delay(0.001);
+                    }
+                    a(columns[j]+16);                            
+                    a(rows[i]);
+                    HAL_Delay(1);
+                }
+            }
+        }
+        return counter;
+    }
+/*     onLeds = { {{1}{0}{0}}
+               {{0}{1}{0}}
+               {{0}{0}{1}} }
+               scroll delay
+    onLeds = { {{0}{0}{0}}
+               {{1}{0}{0}}
+               {{0}{1}{0}} }
+                scroll delay
+    onLeds = { {{0}{0}{0}}
+               {{0}{0}{0}}
+               {{1}{0}{0}} } */
+
+
+    /* void cycleLeds(int onLeds[][2], int numLeds) {
             
         for(int i = 0; i < numLeds; ++i) {
+            
             // turn on 0,0 and 0,6
             
             if(useDelay) {
                 for (int j=0; j < scrollSpeed; ++j) {
                     a(columns[onLeds[i][0]]);
                     a(rows[onLeds[i][1]]+16);
-                    HAL_Delay(1);
                     a(columns[onLeds[i][0]]+16);
                     a(rows[onLeds[i][1]]);
                     HAL_Delay(1);
@@ -235,24 +280,42 @@ int main(void)
             a(rows[onLeds[i][1]]);
             /* if(useDelay) {
                 HAL_Delay(scrollSpeed);
-            } */
+            } 
         }
-    }
+    } */
     
     // wait for button press (active low)
     //while (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
     while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5))
     {
     }
-    
+
+    //set all rows to HIGH   
     a(8);
     a(3);
     a(16);
     a(5);
-    a(9);
-    a(15);
-    a(10);
+    a(9); 
+    a(15); 
+    a(10); 
     a(13);
+
+    
+
+    int onLeds[8][8][1] = {
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{0},{0},{0},{0},{0} },
+        { {0},{0},{0},{1},{0},{0},{0},{0} },
+    };
+
+
+        int counter2 = 0;
+
 
     while (1) // loop forever, blinking the LED
     {
@@ -271,7 +334,8 @@ int main(void)
 // row is ground 8 3 16 5 9 15 10
 // broken column or row pins 13 2 1
         
-        /* // cycle through rows
+
+       /* // cycle through rows
         for(int i = 0; i < 7; ++i) {
             a(rows[i]+16);
             // cycle through columns
@@ -309,16 +373,56 @@ int main(void)
             default:
                 onLeds = {{1,0}, {1,1}, {1,2}, {1, 3}, {1,4}, {1,5}, {1,6}};
         } */
-        int onLeds[][2] = {{arrayNum,0}, {arrayNum,1}, {arrayNum,2}, {arrayNum, 3}, {arrayNum,4}, {arrayNum,5}, {arrayNum,6}};
+        //int onLeds[][2] = {{arrayNum,0}, {arrayNum,1}, {arrayNum,2}, {arrayNum, 3}, {arrayNum,4}, {arrayNum,5}, {arrayNum,6}};
+        
+        
+        
         /* int onLeds2[][2] = {{0,0}, {0,1}, {0,2}, {0, 3}, {0,4}, {0,5}, {0,6}};
         int onLeds3[][2] = {{3,0}, {3,1}, {3,2}, {3, 3}, {3,4}, {3,5}, {3,6}};
         int onLeds4[][2] = {{2,0}, {2,1}, {2,2}, {2, 3}, {2,4}, {2,5}, {2,6}}; */
         scrollSpeed = 20;
         
         arrayNum = rand()%4;
+        //arrayNum = 3;
         //cycleLeds(onLeds, 7);
+
+
+        counter2++;
+        if (counter2 == 3){
+            onLeds[0][2][0] = 1;
+        }
+        if (counter2 == 4){
+            onLeds[0][1][0] = 1;
+        }
+        if (counter2 == 5){
+            onLeds[0][3][0] = 1;
+        }
+        if (counter2 == 6){
+            onLeds[0][0][0] = 1;
+            counter2 = 0;
+        }
+
+        InitializePin(GPIOC, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+        //InitializePin(GPIOC, GPIO_PIN_13, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
+            
+
+
+
+        for (int b = 0; b < 5; b++){
+            b = b + refreshBoard(onLeds, 8, 8)/6; //increase scroll speed depending on how many button presses within one refreshBoard
+        }
+        for (int c = 7; c >= 1; c--){
+            for (int d = 0; d <= 7; d++){
+                onLeds[c][d][0] = onLeds[c-1][d][0];
+            }
+        }
+        for (int e = 0; e <= 7; e++){
+            onLeds[0][e][0] = 0;
+        }
         HAL_Delay(rand()%50);
         
+        //onLeds[6][i][0]
+
         //HAL_Delay(400);
         //HAL_Delay(0.1);
 
