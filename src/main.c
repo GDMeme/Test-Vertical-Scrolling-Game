@@ -227,7 +227,7 @@ int main(void)
         for (int i = 0; i < numRows; i++){
             for (int j = 0; j < numColumns; j++){
                 if (onLeds[i][j][0] == 1){
-                    if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))){
+                    if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) && onLeds[6][0][0] == 1){
                         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, true);
                         pressed = true;
                         HAL_Delay(0.0000000000000000000000000000000000000001);
@@ -408,7 +408,7 @@ int main(void)
 
 
 
-        for (int b = 0; b < 5; b++){
+        for (int b = 0; b < 25; b++){ //b value changes the scroll speed
             b = b + refreshBoard(onLeds, 8, 8)/6; //increase scroll speed depending on how many button presses within one refreshBoard
         }
         for (int c = 7; c >= 1; c--){
