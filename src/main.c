@@ -221,31 +221,71 @@ int main(void)
     int rows[8] = {8, 3, 16, 5, 9, 15, 10, 1};
     int columns[8] = {4, 11, 12, 6, 14, 7, 9, 13}; 
 
-    int refreshBoard(int onLeds[8][8][1], int numRows, int numColumns){   
-        bool pressed = false;    
-        int counter = 0; 
+
+    int refreshBoard(int onLeds[8][8][1], int numRows, int numColumns, int *numberOfNotes, int *score, int *pressed0, int *pressed1, int *pressed2, int *pressed3){   
+        
+        
+        int keyPresses = 0; 
         for (int i = 0; i < numRows; i++){
             for (int j = 0; j < numColumns; j++){
                 if (onLeds[i][j][0] == 1){
-                    if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) && onLeds[6][0][0] == 1){
-                        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, true);
-                        pressed = true;
-                        HAL_Delay(0.0000000000000000000000000000000000000001);
-                        counter += 1;
+                    if (i == 6 && j == 0){
+                        *pressed0 = 1;
                     }
-                    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, false);
+                    if (i == 6 && j == 1){
+                        *pressed1 = 1;
+                    }
+                    if (i == 6 && j == 2){
+                        *pressed2 = 1;                        
+                    }
+                    if (i == 6 && j == 3){
+                        *pressed3 = 1;
+                    }
+                    if (i == 6 && j == 0 && !(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0)) && onLeds[6][0][0] == 1 && *pressed0 == 1){ //zeroth column
+                        *pressed0 = 2;
+                        keyPresses += 1;
+                    }
+                    if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0))){ // mystery code
+                        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, true);
+                    }
+                    if (i == 6 && j == 1 && !(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1)) && onLeds[6][1][0] == 1 && *pressed1 == 1){ //zeroth column
+                        *pressed1 = 2;
+                        keyPresses += 1;
+                    }
+                    if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1))){ // mystery code
+                        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, true);
+                    }
+                    if (i == 6 && j == 2 && !(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0)) && onLeds[6][2][0] == 1 && *pressed2 == 1){ //zeroth column
+                        *pressed2 = 2;
+                        keyPresses += 1;
+                    }
+                    if (!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0))){ // mystery code
+                        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, true);
+                    }
+                    if (i == 6 && j == 3 && !(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4)) && onLeds[6][3][0] == 1 && *pressed3 == 1){ //zeroth column
+                        *pressed3 = 2;
+                        keyPresses += 1;
+                    }
+                    if (!(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4))){ // mystery code
+                        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, true);
+                    }
                     a(columns[j]);
                     a(rows[i]+16);
-                    if (false){
+                    /* if (false){
                         HAL_Delay(0.001);
-                    }
+                    } */
                     a(columns[j]+16);                            
                     a(rows[i]);
                     HAL_Delay(1);
+                    (*numberOfNotes)++;
                 }
             }
         }
-        return counter;
+
+
+
+
+        return keyPresses;
     }
 /*     onLeds = { {{1}{0}{0}}
                {{0}{1}{0}}
@@ -313,12 +353,21 @@ int main(void)
         { {0},{0},{0},{1},{0},{0},{0},{0} },
     };
 
-
-        int counter2 = 0;
-
-
+    int score = 0;
+    
+    int pressed0 = 0;  // 0 means no note  
+    int pressed1 = 0;  // 1 means yes note
+    int pressed2 = 0;  // 2 means yes note and hit
+    int pressed3 = 0;
     while (1) // loop forever, blinking the LED
     {
+        
+        pressed0 = 0;
+        pressed1 = 0;
+        pressed2 = 0;
+        pressed3 = 0;
+
+        int numberOfNotes = 0;
         //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_7);
         //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, true);
         //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, true);
@@ -355,7 +404,7 @@ int main(void)
         //int onLeds[][2] = {{1,0}, {1,1}, {1,2}, {1, 3}, {1,4}, {1,5}, {0,6}, {2,6}};
         
         
-        int arrayNum;
+        //int arrayNum = 0;
         //int onLeds[7][2];
         /* witch(arrayNum) {
             case 0:
@@ -382,35 +431,72 @@ int main(void)
         int onLeds4[][2] = {{2,0}, {2,1}, {2,2}, {2, 3}, {2,4}, {2,5}, {2,6}}; */
         scrollSpeed = 20;
         
-        arrayNum = rand()%4;
+        //arrayNum = rand()%4;
         //arrayNum = 3;
         //cycleLeds(onLeds, 7);
 
 
-        counter2++;
-        if (counter2 == 3){
-            onLeds[0][2][0] = 1;
-        }
-        if (counter2 == 4){
-            onLeds[0][1][0] = 1;
-        }
-        if (counter2 == 5){
-            onLeds[0][3][0] = 1;
-        }
-        if (counter2 == 6){
-            onLeds[0][0][0] = 1;
-            counter2 = 0;
-        }
 
-        InitializePin(GPIOC, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+        InitializePin(GPIOA, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
         //InitializePin(GPIOC, GPIO_PIN_13, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
-            
-
-
-
-        for (int b = 0; b < 25; b++){ //b value changes the scroll speed
-            b = b + refreshBoard(onLeds, 8, 8)/6; //increase scroll speed depending on how many button presses within one refreshBoard
+        InitializePin(GPIOC, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
+        InitializePin(GPIOC, GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
+        InitializePin(GPIOB, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
+        InitializePin(GPIOA, GPIO_PIN_4, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
+        /* if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0))){
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, true);
+            onLeds[6][0][0] = 1;
+            HAL_Delay(1);
         }
+        if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1))){
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, true);
+            onLeds[6][1][0] = 1;
+            HAL_Delay(1);
+        }
+        if (!(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0))){
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, true);
+            onLeds[6][2][0] = 1;
+            HAL_Delay(1);
+        }
+        if (!(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4))){
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, true);
+            onLeds[6][3][0] = 1;
+            HAL_Delay(1);
+        } */
+        
+
+        for (int b = 0; b < 550000; b++){ //b value changes the scroll speed
+            b = b + refreshBoard(onLeds, 8, 8, &numberOfNotes, &score, &pressed0, &pressed1, &pressed2, &pressed3)/6 
+            + numberOfNotes*numberOfNotes*numberOfNotes/7; //increase scroll speed depending on how many key presses and ON leds within one refreshBoard
+        }
+        
+        if (pressed0 == 1){ // if == 0, dont do anything to score
+            score -= 1;
+        } else if (pressed0 == 2){
+            score += 1;
+        }
+        if (pressed1 == 1){ // if == 0, dont do anything to score
+            score -= 1;
+        } else if (pressed1 == 2){
+            score += 1;
+        }
+        if (pressed2 == 1){ // if == 0, dont do anything to score
+            score -= 1;
+        } else if (pressed2 == 2){
+            score += 1;
+        }
+        if (pressed3 == 1){ // if == 0, dont do anything to score
+            score -= 1;
+        } else if (pressed3 == 2){
+            score += 1;
+        }
+         
+ /*        char str[100];
+        sprintf(str, "value of score", score);
+        // lu == "long unsigned", ld = "long decimal", where "long" is 32 bit and "decimal" implies signed
+        puts(str); // transmit the buffer to the host computer's serial monitor in VSCode/PlatformIO
+ */
+
         for (int c = 7; c >= 1; c--){
             for (int d = 0; d <= 7; d++){
                 onLeds[c][d][0] = onLeds[c-1][d][0];
@@ -419,6 +505,18 @@ int main(void)
         for (int e = 0; e <= 7; e++){
             onLeds[0][e][0] = 0;
         }
+        for (int f = 0; f < 4; f++){
+            if (rand()%6 == 1){ //this 4 controls the density of notes; higher means less dense, lower means more dense
+                onLeds[0][f][0] = 1;
+            }
+        }
+        InitializePin(GPIOA, GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+        if (score > 0){
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, true);
+        } else if (score <= 0){
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, false); 
+        }
+
         HAL_Delay(rand()%50);
         
         //onLeds[6][i][0]
