@@ -387,6 +387,7 @@ int main(void)
     };
 
     int score = 0;
+    int lives = 10;
 
     int pressed0 = 0;  // 0 means no note  
     int pressed1 = 0;  // 1 means yes note
@@ -527,21 +528,25 @@ int main(void)
         // determining the score
         if (pressed0 == 1){
             score -= 1;
+            lives -= 1;
         } else if (pressed0 == 2){
             score += 1;
         }
         if (pressed1 == 1){
             score -= 1;
+            lives -= 1;
         } else if (pressed1 == 2){
             score += 1;
         }
         if (pressed2 == 1){
             score -= 1;
+            lives -= 1;
         } else if (pressed2 == 2){
             score += 1;
         }
         if (pressed3 == 1){
             score -= 1;
+            lives -= 1;
         } else if (pressed3 == 2){
             score += 1;
         }
@@ -578,8 +583,20 @@ int main(void)
             HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, false); 
             score = 0;
         }
+        if(score > 10) {
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, true);
+        } else if (score <= 10){
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, false);
+        } if(score > 20) {
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, true);
+        } else if (score <= 20){
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, false);
+        }
+        if (lives == 0){
+            break;
+        }
 
-        HAL_Delay(rand()%50);
+        //HAL_Delay(rand()%50);
         
         //onLeds[6][i][0]
 
@@ -601,6 +618,8 @@ int main(void)
         //Row 8
         //a(13);
     }
+     // implement showing score on the led matrix at the end
+        // show first digit of number, then second digit of number
                     
     
 #endif
