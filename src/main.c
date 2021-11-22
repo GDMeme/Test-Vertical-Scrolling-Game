@@ -213,9 +213,11 @@ int main(void)
     
 
     // initialize LEDs
-    InitializePin(GPIOA, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOC, GPIO_PIN_12, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOA, GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOC, GPIO_PIN_10, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+
+    InitializePin(GPIOC, GPIO_PIN_11, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
 
     // initialize key switches
     InitializePin(GPIOC, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
@@ -227,7 +229,7 @@ int main(void)
 
 
     //bool useDelay = true; // probably not possible to implement this
-    int scrollSpeed = 0;
+    //int scrollSpeed = 0;
 
     // each of the elements arrays corresponds to the pin number at the ith row/column, 0 <= i <= 7 
     int rows[8] = {8, 3, 16, 5, 9, 15, 10, 1};
@@ -235,7 +237,7 @@ int main(void)
 
 
     int refreshBoard(int onLeds[8][8][1], int numRows, int numColumns, int *numberOfNotes, int *score, int *pressed0, int *pressed1, int *pressed2, int *pressed3, bool *tooEarly0,
-                    bool *tooEarly1, bool *tooEarly2, bool *tooEarly3){    
+                    bool *tooEarly1, bool *tooEarly2, bool *tooEarly3, int *raw0){    
         int keyPresses = 0; 
         for (int i = 0; i < numRows; i++){ // i represents the rows
             for (int j = 0; j < numColumns; j++){ // j represents the columns
@@ -304,6 +306,31 @@ int main(void)
                             *tooEarly3 = false;
                         }
                     }
+                    if (*raw0 > 1000);
+                        if (*pressed0 == 2 && (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0))){ // anti mash checking
+                            *pressed0 = 3;
+                        }
+                        if (*pressed1 == 2 && (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1))){
+                            *pressed1 = 3;
+                        }
+                        if (*pressed2 == 2 && (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0))){
+                            *pressed2 = 3;
+                        }
+                        if (*pressed3 == 2 && (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4))){
+                            *pressed3 = 3;
+                        }
+                        if (*pressed0 == 3 && !(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0))){
+                            *pressed0 = 4;
+                        }
+                        if (*pressed1 == 3 && !(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1))){
+                            *pressed1 = 4;
+                        }
+                        if (*pressed2 == 3 && !(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0))){
+                            *pressed2 = 4;
+                        }
+                        if (*pressed3 == 3 && !(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4))){
+                            *pressed3 = 4;
+                        }
                     turnOnOff(columns[j]); //flicker the LEDs
                     turnOnOff(rows[i]+16);
                     /* if (true){ // this sets the LEDs to max brightness, messes up scroll speed as well
@@ -392,7 +419,8 @@ int main(void)
     int pressed0 = 0;  // 0 means no note  
     int pressed1 = 0;  // 1 means yes note
     int pressed2 = 0;  // 2 means yes note and already hit
-    int pressed3 = 0;
+    int pressed3 = 0;  // 3 means yes note, already hit, and let go of key switch
+    // 4 means yes note, already hit, let go of key switch, and pressed it again
 
     bool tooEarly0 = false;
     bool tooEarly1 = false;
@@ -403,6 +431,17 @@ int main(void)
 
     while (1) // loop forever, blinking the LED
     {
+
+        //initialize potentiometer
+        __HAL_RCC_ADC1_CLK_ENABLE();        // enable ADC 1
+        ADC_HandleTypeDef adcInstance;      // this variable stores an instance of the ADC
+        InitializeADC(&adcInstance, ADC1);  // initialize the ADC instance
+        // Enables the input pins
+        // (on this board, pin A0 is connected to channel 0 of ADC1, and A1 is connected to channel 1 of ADC1)
+        InitializePin(GPIOA, GPIO_PIN_0, GPIO_MODE_ANALOG, GPIO_NOPULL, 0);   
+        // read the ADC values (0 -> 0V, 2^12 -> 3.3V)
+        int raw0 = ReadADC(&adcInstance, ADC_CHANNEL_0); // raw0 is between 0 and 4096
+
         // setting initial conditions each time the LED moves
         pressed0 = 0;
         pressed1 = 0;
@@ -519,37 +558,45 @@ int main(void)
         }
 
         // scroll speed stuff 
-        scrollSpeed = 5500000; // make this depend on potentiometer if possible, this speed is fine maybe a bit fast
-        for (int b = 0; b < scrollSpeed; b++){ // b value changes the scroll speed
-            b = b + refreshBoard(onLeds, 8, 8, &numberOfNotes, &score, &pressed0, &pressed1, &pressed2, &pressed3, &tooEarly0, &tooEarly1, &tooEarly2, &tooEarly3)/6 
-            + numberOfNotes*numberOfNotes*numberOfNotes/7; // increases the scroll speed depending on how many key presses and ON leds within one refreshBoard
+        //scrollSpeed = 100000; // make this depend on potentiometer if possible, this speed is fine maybe a bit fast
+        for (int b = 0; b < (100000 + (1342 * raw0)); b++){ // b value changes the scroll speed
+            b = b + refreshBoard(onLeds, 8, 8, &numberOfNotes, &score, &pressed0, &pressed1, &pressed2, &pressed3, &tooEarly0, &tooEarly1, &tooEarly2, &tooEarly3, &raw0)/6 
+            + numberOfNotes*numberOfNotes*numberOfNotes/7 + (raw0 * raw0/10000); // increases the scroll speed depending on how many key presses and ON leds within one refreshBoard
         }
-        
         // determining the score
-        if (pressed0 == 1){
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, false);
+        if (pressed0 == 1 || pressed0 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed0 == 2){
+        } else if (pressed0 == 2 || pressed0 == 3){
             score += 1;
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
-        if (pressed1 == 1){
+        if (pressed1 == 1 || pressed1 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed1 == 2){
+        } else if (pressed1 == 2 || pressed1 == 3){
             score += 1;
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
-        if (pressed2 == 1){
+        if (pressed2 == 1 || pressed2 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed2 == 2){
+        } else if (pressed2 == 2 || pressed2 == 3){
             score += 1;
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
-        if (pressed3 == 1){
+        if (pressed3 == 1 || pressed3 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed3 == 2){
+        } else if (pressed3 == 2 || pressed3 == 3){
             score += 1;
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
+        if (!(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1))){
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
+        }
+
          
  /*        char str[100];
         sprintf(str, "value of score", score);
@@ -571,7 +618,7 @@ int main(void)
 
         // randomly generate notes at the top row
         for (int f = 0; f < 4; f++){
-            if (rand()%6 == 1){ //this 4 controls the density of notes; higher means less dense, lower means more dense
+            if (rand()%(raw0/683) == 1){ //this 4 controls the density of notes; higher means less dense, lower means more dense
                 onLeds[0][f][0] = 1;
             }
         }
@@ -584,16 +631,16 @@ int main(void)
             score = 0;
         }
         if(score > 10) {
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, true);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, true);
         } else if (score <= 10){
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, false);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, false);
         } if(score > 20) {
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, true);
         } else if (score <= 20){
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, false);
         }
         if (lives == 0){
-            break;
+            //break;
         }
 
         //HAL_Delay(rand()%50);
@@ -617,6 +664,14 @@ int main(void)
         //a(2);
         //Row 8
         //a(13);
+
+
+
+    
+    
+
+
+
     }
      // implement showing score on the led matrix at the end
         // show first digit of number, then second digit of number
