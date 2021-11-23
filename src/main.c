@@ -616,4 +616,12 @@ int main(void)
             memcpy(&onLeds[8][8][1], &digitDisplay9[8][8][1], 8*8*sizeof(digitDisplay9));
         } 
     }
+return 0;
+}
+
+// This function is called by the HAL once every millisecond
+void SysTick_Handler(void)
+{
+    HAL_IncTick(); // tell HAL that a new tick has happened
+    // we can do other things in here too if we need to, but be careful
 }
