@@ -336,24 +336,6 @@ int main(void)
         return keyPresses;
     }
 
-    /* int refreshBoardScore(int onLeds[8][8][1], int numRows, int numColumns){    
-        for (int i = 0; i < numRows; i++){ // i represents the rows
-            for (int j = 0; j < numColumns; j++){ // j represents the columns
-                if (onLeds[i][j][0] == 1){ // found an LED that's going to be on
-                    turnOnOff(columns[j]); //flicker the LEDs
-                    turnOnOff(rows[i]+16);
-                    turnOnOff(columns[j]+16);                            
-                    turnOnOff(rows[i]);
-                    HAL_Delay(1);
-                    (*numberOfNotes)++; // numberOfNotes does not actually represent how many notes there are, since refreshBoard is called a bunch of times
-                    // a bit scuffed because numberOfNotes does not reset to 0 after each refreshBoard, so it keeps building up every time refreshBoard is called
-                    // scroll speed seems to be fine though so leave it as is
-                }
-            }
-        }
-        return keyPresses;
-    } */
-
     //set all rows to HIGH   
     turnOnOff(8);
     turnOnOff(3);
@@ -375,70 +357,89 @@ int main(void)
         { {0},{0},{0},{1},{0},{0},{0},{0} },
     };
 
+    int refreshBoardScore(int onLeds[8][8][1], int numRows, int numColumns){    
+        for(int i = 0; i < 50; ++i) {
+            for (int i = 0; i < numRows; i++){ // i represents the rows
+                for (int j = 0; j < numColumns; j++){ // j represents the columns
+                    if (onLeds[i][j][0] == 1){ // found an LED that's going to be on
+                        turnOnOff(columns[j]); //flicker the LEDs
+                        turnOnOff(rows[i]+16);
+                        turnOnOff(columns[j]+16);                            
+                        turnOnOff(rows[i]);
+                        HAL_Delay(1);
+                    }
+                }
+            }
+        }
+        
+    }
+
     void displayDigit(int digit) {
+        
         if(digit == 0) {
-            int digitDisplay0[8][8][1] = {
-                { {1},{1},{0},{0},{0},{0},{0},{0} },
-                { {1},{1},{0},{0},{0},{0},{0},{0} },
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay0[8][8][1], 8*8*sizeof(digitDisplay0));
+            refreshBoardScore(digitDisplay, 8, 8);
+
         } else if(digit == 1) {
-            int digitDisplay1[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{1},{1},{0},{0},{0},{0},{0} },
+                { {0},{0},{1},{0},{0},{0},{0},{0} },
+                { {0},{0},{1},{0},{0},{0},{0},{0} },
+                { {0},{0},{1},{0},{0},{0},{0},{0} },
+                { {0},{0},{1},{0},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay1[8][8][1], 8*8*sizeof(digitDisplay1));
+            refreshBoardScore(digitDisplay, 8, 8);
 
         } else if(digit == 2) {
-            int digitDisplay2[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{0},{0},{1},{0},{0},{0},{0} },
+                { {0},{0},{1},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{0},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay2[8][8][1], 8*8*sizeof(digitDisplay2));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 3) {
-            int digitDisplay3[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{0},{1},{1},{0},{0},{0},{0} },
+                { {0},{0},{1},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay3[8][8][1], 8*8*sizeof(digitDisplay3));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 4) {
-            int digitDisplay4[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
-                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{0},{1},{0},{0},{0},{0} },
+                { {0},{1},{1},{1},{0},{0},{0},{0} },
+                { {0},{0},{0},{1},{0},{0},{0},{0} },
+                { {0},{0},{0},{1},{0},{0},{0},{0} },
+                { {0},{0},{0},{1},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay4[8][8][1], 8*8*sizeof(digitDisplay4));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 5) {
-            int digitDisplay5[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -448,9 +449,9 @@ int main(void)
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay5[8][8][1], 8*8*sizeof(digitDisplay5));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 6) {
-            int digitDisplay6[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -460,9 +461,9 @@ int main(void)
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay6[8][8][1], 8*8*sizeof(digitDisplay6));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 7) {
-            int digitDisplay7[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -472,9 +473,9 @@ int main(void)
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay7[8][8][1], 8*8*sizeof(digitDisplay7));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 8) {
-            int digitDisplay8[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -484,9 +485,9 @@ int main(void)
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay8[8][8][1], 8*8*sizeof(digitDisplay8));
+            refreshBoardScore(digitDisplay, 8, 8);
         } else if(digit == 9) {
-            int digitDisplay9[8][8][1] = {
+            int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -496,7 +497,19 @@ int main(void)
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
-            memcpy(&onLeds[8][8][1], &digitDisplay9[8][8][1], 8*8*sizeof(digitDisplay9));
+            refreshBoardScore(digitDisplay, 8, 8);
+        } else if(digit == 10) {
+            int digitDisplay[8][8][1] = {
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{0},{0},{0},{0},{0} },
+                { {0},{0},{0},{1},{0},{0},{0},{0} },
+            };
+            refreshBoardScore(digitDisplay, 8, 8);
         } 
     }
 
@@ -615,8 +628,13 @@ int main(void)
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, false);
         }
         if (lives == 0){
-            // Display score on the led matrix after each game ends
-            /* int scoreOnesDigit = score%10;
+            displayDigit(1);
+            displayDigit(2);
+            displayDigit(3);
+            displayDigit(10);
+            
+            /* // Display score on the led matrix after each game ends
+            int scoreOnesDigit = score%10;
             int scoreTensDigit = score%100 - scoreOnesDigit;
             int scoreHundredsDigit = score%1000 - scoreTensDigit*10 - scoreOnesDigit;
             // Show first, second, and third digits of the total score
@@ -627,6 +645,7 @@ int main(void)
                 displayDigit(scoreTensDigit);
             }
             displayDigit(scoreOnesDigit); */
+            break;
         } else if(lives > 0) {
             shiftNotes();
         }
