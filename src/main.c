@@ -35,10 +35,17 @@ int main(void)
     // 4 means yes note, already hit, let go of key switch, and pressed it again
     // 5 means no note and hit it
 
+    int numberOfNotes = 0;
+
     bool tooEarly0 = false;
     bool tooEarly1 = false;
     bool tooEarly2 = false;
     bool tooEarly3 = false;
+
+    bool isPressed0 = false;
+    bool isPressed1 = false;
+    bool isPressed2 = false;
+    bool isPressed3 = false;
 
     InitializePin(GPIOA, GPIO_PIN_3, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOA, GPIO_PIN_2, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
@@ -220,7 +227,7 @@ int main(void)
 
     // display ON LEDs on the matrix
     int refreshBoard(int onLeds[8][8][1], int numRows, int numColumns, int *numberOfNotes, int *score, int *pressed0, int *pressed1, int *pressed2, int *pressed3, bool *tooEarly0,
-                    bool *tooEarly1, bool *tooEarly2, bool *tooEarly3, int *raw0){    
+                    bool *tooEarly1, bool *tooEarly2, bool *tooEarly3, int *raw0, bool *isPressed0, bool *isPressed1, bool *isPressed2, bool *isPressed3){    
         int keyPresses = 0; 
         for (int i = 0; i < numRows; i++){ // i represents the rows
             for (int j = 0; j < numColumns; j++){ // j represents the columns
@@ -316,16 +323,24 @@ int main(void)
                         }
                     }
                     if (*pressed0 == 0 && !(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0))){ // check for hitting empty lane
+                        if (*isPressed0 != true){
                         *pressed0 = 5;
+                        }
                     }
                     if (*pressed1 == 0 && !(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1))){
+                        if (*isPressed1 != true){
                         *pressed1 = 5;
+                        }
                     }
                     if (*pressed2 == 0 && !(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_0))){
-                        *pressed2 = 5;
+                        if (*isPressed2 != true){
+                        *pressed0 = 5;
+                        }
                     }
                     if (*pressed3 == 0 && !(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4))){
-                        *pressed3 = 5;
+                        if (*isPressed3 != true){
+                        *pressed0 = 5;
+                        }
                     }
                     turnOnOff(columns[j]); //flicker the LEDs
                     turnOnOff(rows[i]+16);
@@ -539,8 +554,6 @@ int main(void)
         }
     }
 
-    int numberOfNotes = 0;
-
     while(1) // loop forever, blinking the LED
     {
 
@@ -581,8 +594,9 @@ int main(void)
 
         // scroll speed 
         for (int b = 0; b < (100000 + (1342 * raw0)); b++){ // b value changes the scroll speed
-            b = b + refreshBoard(onLeds, 8, 8, &numberOfNotes, &score, &pressed0, &pressed1, &pressed2, &pressed3, &tooEarly0, &tooEarly1, &tooEarly2, &tooEarly3, &raw0)/6 
-            + numberOfNotes*numberOfNotes*numberOfNotes/7; // increases the scroll speed depending on how many key presses and ON leds within one refreshBoard
+            b = b + refreshBoard(onLeds, 8, 8, &numberOfNotes, &score, &pressed0, &pressed1, &pressed2, &pressed3, &tooEarly0, &tooEarly1, &tooEarly2, &tooEarly3, &raw0, 
+            &isPressed0, &isPressed1, &isPressed2, &isPressed3)/6 + numberOfNotes*numberOfNotes*numberOfNotes/7; 
+            // increases the scroll speed depending on how many key presses and ON leds within one refreshBoard
         }
         // determining the score
         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, false);
@@ -596,24 +610,42 @@ int main(void)
         if (pressed1 == 1 || pressed1 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed1 == 2 || pressed1 == 3 || pressed0 == 5){
+        } else if (pressed1 == 2 || pressed1 == 3 || pressed1 == 5){
             score += 1;
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
         if (pressed2 == 1 || pressed2 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed2 == 2 || pressed2 == 3 || pressed0 == 5){
+        } else if (pressed2 == 2 || pressed2 == 3 || pressed2 == 5){
             score += 1;
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
         if (pressed3 == 1 || pressed3 == 4){
             score -= 1;
             lives -= 1;
-        } else if (pressed3 == 2 || pressed3 == 3 || pressed0 == 5){
+        } else if (pressed3 == 2 || pressed3 == 3 || pressed3 == 5){
             score += 1;
             HAL_GPIO_WritePin(GPIOC, GPIO_PIN_11, true);
         }
+
+        isPressed0 = false;
+        isPressed1 = false;
+        isPressed2 = false;
+        isPressed3 = false;
+        if (pressed0 == 2){
+            isPressed0 = true;
+        }
+        if (pressed1 == 2){
+            isPressed1 = true;
+        }
+        if (pressed2 == 2){
+            isPressed2 = true;
+        }
+        if (pressed3 == 2){
+            isPressed3 = true;
+        }
+
 
         // turn on/off leds relating to score
         if (score > 0){
@@ -647,7 +679,6 @@ int main(void)
         // ending screen displaying score
         if (lives <= 0){
             HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, false);
-
             // Display score on the led matrix after each game ends
             int scoreOnesDigit = score%10;
             int scoreHundredsDigit = ((score%1000) - (score%100))/100;
