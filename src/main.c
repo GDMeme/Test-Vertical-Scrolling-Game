@@ -194,11 +194,19 @@ int main(void)
     
 
     // initialize LEDs
+
+    // score LEDs
     InitializePin(GPIOC, GPIO_PIN_12, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOA, GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
     InitializePin(GPIOC, GPIO_PIN_10, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
 
+    // hit LED
     InitializePin(GPIOC, GPIO_PIN_11, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+
+    // lives LEDs
+    InitializePin(GPIOB, GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOC, GPIO_PIN_2, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
+    InitializePin(GPIOC, GPIO_PIN_3, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, 0);
 
     // initialize key switches
     InitializePin(GPIOC, GPIO_PIN_0, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, 0);
@@ -210,7 +218,7 @@ int main(void)
     int rows[8] = {8, 3, 16, 5, 9, 15, 10, 1};
     int columns[8] = {4, 11, 12, 6, 14, 7, 9, 13}; 
 
-
+    // display ON LEDs on the matrix
     int refreshBoard(int onLeds[8][8][1], int numRows, int numColumns, int *numberOfNotes, int *score, int *pressed0, int *pressed1, int *pressed2, int *pressed3, bool *tooEarly0,
                     bool *tooEarly1, bool *tooEarly2, bool *tooEarly3, int *raw0){    
         int keyPresses = 0; 
@@ -370,12 +378,10 @@ int main(void)
                     }
                 }
             }
-        }
-        
+        }  
     }
 
     void displayDigit(int digit) {
-        
         if(digit == 0) {
             int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -388,7 +394,6 @@ int main(void)
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
             refreshBoardScore(digitDisplay, 8, 8);
-
         } else if(digit == 1) {
             int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -401,7 +406,6 @@ int main(void)
                 { {0},{0},{0},{1},{0},{0},{0},{0} },
             };
             refreshBoardScore(digitDisplay, 8, 8);
-
         } else if(digit == 2) {
             int digitDisplay[8][8][1] = {
                 { {0},{0},{0},{0},{0},{0},{0},{0} },
@@ -528,7 +532,8 @@ int main(void)
 
         // randomly generate notes at the top row
         for (int f = 0; f < 4; f++){
-            if (rand()%(raw0/683) == 1){ // raw0/683 controls the density of notes; a higher value means less dense, lower value means more dense
+            int scrollSpeed = raw0/683; // raw0/683 controls the density of notes; a higher value means less dense, lower value means more dense
+            if (rand()%(scrollSpeed + 2) == 1){ 
                 onLeds[0][f][0] = 1;
             }
         }
@@ -612,22 +617,37 @@ int main(void)
 
         // turn on/off leds relating to score
         if (score > 0){
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, true);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, true);
         } else if (score <= 0){
-            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, false); 
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, false);
             score = 0;
         }
         if(score > 10) {
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, true);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, true);
         } else if (score <= 10){
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, false);
+           HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, false); 
         } 
         if(score > 20) {
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, true);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, true);
+            lives = 0;
         } else if (score <= 20){
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, false);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, false);
         }
-        if (lives == 0){
+
+        // turn on/off leds relating to lives
+        if (lives > 7 && lives <= 10){
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, true);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, true);
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, true);
+        } else if (lives <= 7 && lives > 3){
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_2, false);
+        } else if (lives <= 3) {
+            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_3, false);
+        }
+        // ending screen displaying score
+        if (lives <= 0){
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, false);
+
             // Display score on the led matrix after each game ends
             int scoreOnesDigit = score%10;
             int scoreHundredsDigit = ((score%1000) - (score%100))/100;
@@ -650,7 +670,7 @@ int main(void)
             }
             displayDigit(scoreOnesDigit);
             break;
-        } else if(lives > 0) {
+        } else if (lives > 0) {
             shiftNotes();
         }
     }
